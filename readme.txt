@@ -1,2 +1,2 @@
 
-These file we are used to write a comment parallel and can be used to handle conflicts.
+ we are using these files to write a comment in parallel and very helpful in handling conflicts.
