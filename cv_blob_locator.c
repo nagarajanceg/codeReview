@@ -22,7 +22,8 @@
  * @author C. De Wagter
  * Find a colored item and track its geo-location and update a waypoint to it
  */
-
+//Binary Large Object
+//The (maximum) frequency to run the calculations at. If zero, it will max out at the camera frame rate 
 #ifndef BLOB_LOCATOR_FPS
 #define BLOB_LOCATOR_FPS 0       ///< Default FPS (zero means run at camera fps)
 #endif

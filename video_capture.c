@@ -37,8 +37,9 @@
 #if JPEG_WITH_EXIF_HEADER
 #include "lib/exif/exif_module.h"
 #endif
-
+// To ensure the code is included only once
 #ifndef VIDEO_CAPTURE_PATH
+//captured video stored in /data/video/images
 #define VIDEO_CAPTURE_PATH /data/video/images
 #endif
 
@@ -46,6 +47,7 @@
 #define VIDEO_CAPTURE_JPEG_QUALITY 99
 #endif
 
+// video capture frames per second
 #ifndef VIDEO_CAPTURE_FPS
 #define VIDEO_CAPTURE_FPS 0       ///< Default FPS (zero means run at camera fps)
 #endif
@@ -53,7 +55,7 @@ PRINT_CONFIG_VAR(VIDEO_CAPTURE_FPS)
 
 // Module settings
 bool video_capture_take_shot = false;
-int video_capture_index = 0;
+int video_capture_index = 0; /* initialize the image location index as 0*/
 
 // Forward function declarations
 struct image_t *video_capture_func(struct image_t *img);
@@ -64,17 +66,19 @@ void video_capture_init(void)
 {
   // Create the images directory
   char save_name[128];
+  //mkdir -p creates the directory along with parent directory if it's not available
   sprintf(save_name, "mkdir -p %s", STRINGIFY(VIDEO_CAPTURE_PATH));
   if (system(save_name) != 0) {
     printf("[video_capture] Could not create images directory %s.\n", STRINGIFY(VIDEO_CAPTURE_PATH));
     return;
   }
-
+  /*  create a listener with necessary attributes. Assign the video_capture_func as an action method to the listener
+   and mapped to appropriate video capture device*/
   // Add function to computer vision pipeline
   cv_add_to_device(&VIDEO_CAPTURE_CAMERA, video_capture_func, VIDEO_CAPTURE_FPS);
 }
 
-
+/*Act as a listener method used to save the captured image*/
 struct image_t *video_capture_func(struct image_t *img)
 {
   // If take_shot bool is set, save the image
@@ -114,7 +118,10 @@ void video_capture_save(struct image_t *img)
 
     // Create jpg image from raw frame
     struct image_t img_jpeg;
+    /*Based on the dimension and image type (JPEG, Gradient, YUV) the size 
+    can be calculated and dynamically allocate memory */
     image_create(&img_jpeg, img->w, img->h, IMAGE_JPEG);
+    
     jpeg_encode_image(img, &img_jpeg, VIDEO_CAPTURE_JPEG_QUALITY, true);
 
 #if JPEG_WITH_EXIF_HEADER

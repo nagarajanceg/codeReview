@@ -27,7 +27,7 @@
 #define CV_BLOB_LOCATOR_H
 
 #include <stdint.h>
-
+/* extern - already defined in someother fille */
 extern uint8_t color_lum_min;
 extern uint8_t color_lum_max;
 
