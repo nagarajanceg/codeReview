@@ -22,3 +22,23 @@ struct image_t {
   uint32_t buf_size;      ///< The buffer size
   void *buf;              ///< Image buffer (depending on the image_type)
 };
+
+
+struct camera_frame_t {
+  int32_t w;     ///< Frame width [px]
+  int32_t h;     ///< Frame height [px]
+  int32_t f;     ///< Camera Focal length in [px]
+  int32_t px;    ///< Target pixel coordinate (left = 0)
+  int32_t py;    ///< Target pixel coordinate (top = 0)
+};
+
+
+// georeference_init(); used in cv_blob_locator.c 
+struct georeference_t {
+  struct Int32Vect3 target_i;   ///< Target in pixels, with z being the focal length in pixels, x=up,y=right,out
+  struct Int32Vect3 target_l;   ///< Target in meters, relative to the drone in LTP frame
+
+  struct Int32Vect3 x_t;        ///< Target coordinates NED
+
+  struct georeference_filter_t filter;  ///< Filter waypoint location
+};

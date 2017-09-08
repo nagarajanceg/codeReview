@@ -130,7 +130,6 @@ struct image_t *cv_window_func(struct image_t *img)
     temp = temp << 16;
     temp += coordinate[1];
     blob_locator = temp;
-
   }
 
   return NULL;
@@ -158,7 +157,8 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
   // Output image
   struct image_t dst;
 
-  //image is created by using the width,height and type and is stored in dst
+  //image is created by using the width,height and type and is stored in dst of structure image_t
+  // Based on the type of image(YUV422, JPEG, IMAGE_GRADIENT) , size is allocated dynamically 
   image_create(&dst,
                img->w,
                img->h,
@@ -329,6 +329,7 @@ void cv_blob_locator_event(void)
 
 extern void cv_blob_locator_start(void)
 {
+  /*Initialize the 3D as (0,0,0) with zero filter and focus_length as 400 */
   georeference_init();
 }
 
