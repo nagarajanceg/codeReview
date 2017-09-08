@@ -174,7 +174,7 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
   int largest_id = -1;
   int largest_size = 0;
 
-  // Find largest
+  // Finds the label which has largest label count and assigns it to the largest_size
   for (int i = 0; i < labels_count; i++) {
     // Only consider large blobs
     if (labels[i].pixel_cnt > 50) {
@@ -239,7 +239,7 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
 #include <stdio.h>
 
 
-void cv_blob_locator_init(void)
+void cv_blob_locator_init(void) //initializing the global variables
 {
   // Red board in sunlight
   color_lum_min = 100;
@@ -259,8 +259,9 @@ void cv_blob_locator_init(void)
 
   cv_blob_locator_reset = 0;
 
-  georeference_init();
+  georeference_init(); //the dimensions of the vectors are initialized
 
+  //Adds a video listener
   cv_add_to_device(&BLOB_LOCATOR_CAMERA, cv_blob_locator_func, BLOB_LOCATOR_FPS);
   cv_add_to_device(&BLOB_LOCATOR_CAMERA, cv_marker_func, BLOB_LOCATOR_FPS);
   cv_add_to_device(&BLOB_LOCATOR_CAMERA, cv_window_func, BLOB_LOCATOR_FPS);
