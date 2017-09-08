@@ -59,7 +59,7 @@ volatile bool blob_enabled = false; //blob locator is disabled
 volatile bool marker_enabled = false; //marker is disabled
 volatile bool window_enabled = false;
 
-// Computer vision thread
+// Computer vision threads
 struct image_t *cv_marker_func(struct image_t *img);
 struct image_t *cv_marker_func(struct image_t *img)
 {
