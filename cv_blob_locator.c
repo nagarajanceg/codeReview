@@ -52,6 +52,7 @@ int geofilter_length = 5; //initializes the length of time the geofilter will be
 int marker_size = 18; //sets the size of the marker
 int record_video = 0;
 
+/*volatile - the value of the variable can change at any time*/
 volatile uint32_t blob_locator = 0; 
 
 volatile bool blob_enabled = false; //blob locator is disabled
@@ -224,7 +225,7 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
 
 
     uint32_t temp = cgx;
-    temp = temp << 16;
+    temp = temp << 16; // temp is multiplied by 16 using left bitwise shift 
     temp += cgy;
     blob_locator = temp;
   }

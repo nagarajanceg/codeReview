@@ -1,0 +1,24 @@
+
+/* These data types used in both cv_blob_locator.c and video_capture.c */
+typedef unsigned char       uint8_t;/*8 bit unsigned char */
+typedef   signed char        int8_t;/*8 bit signed char */
+typedef unsigned short     uint16_t; /*16 bit unsigned short */
+typedef   signed short      int16_t;/*16 bit signed short */
+typedef unsigned long      uint32_t;/*32 bit unsigned long */
+typedef   signed long       int32_t;/*32 bit signed long */
+typedef unsigned long long uint64_t; /*64 bit unsigned long */
+typedef   signed long long  int64_t; /*64 bit signed long */
+
+/* Main image structure */
+struct image_t {
+  enum image_type type;   ///< The image type
+  uint16_t w;             ///< Image width
+  uint16_t h;             ///< Image height
+  struct timeval ts;      ///< The timestamp of creation
+  struct FloatEulers *eulerAngles;   ///< Pointer to the Euler Angles
+  uint32_t pprz_ts;       ///< The timestamp in us since system startup
+
+  uint8_t buf_idx;        ///< Buffer index for V4L2 freeing
+  uint32_t buf_size;      ///< The buffer size
+  void *buf;              ///< Image buffer (depending on the image_type)
+};
