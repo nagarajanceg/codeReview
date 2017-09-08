@@ -36,26 +36,26 @@ PRINT_CONFIG_VAR(BLOB_LOCATOR_FPS)
 #include "modules/computer_vision/detect_window.h"
 
 
-uint8_t color_lum_min;
-uint8_t color_lum_max;
+uint8_t color_lum_min; //declaration of lower upper middle filter minimum range value
+uint8_t color_lum_max; //declaration of lower upper middle filter maximum range value
 
-uint8_t color_cb_min;
-uint8_t color_cb_max;
+uint8_t color_cb_min; //declaration of minimum range value blue chromiance
+uint8_t color_cb_max; //declaration of maximum range value blue chromiance
 
-uint8_t color_cr_min;
-uint8_t color_cr_max;
+uint8_t color_cr_min; //declaration of minimum range value red chromiance
+uint8_t color_cr_max; //declaration of maximum range value red chromiance
 
 uint8_t cv_blob_locator_reset;
 uint8_t cv_blob_locator_type;
 
-int geofilter_length = 5;
-int marker_size = 18;
+int geofilter_length = 5; //initializes the length of time the geofilter will be active
+int marker_size = 18; //sets the size of the marker
 int record_video = 0;
 
-volatile uint32_t blob_locator = 0;
+volatile uint32_t blob_locator = 0; 
 
-volatile bool blob_enabled = false;
-volatile bool marker_enabled = false;
+volatile bool blob_enabled = false; //blob locator is disabled
+volatile bool marker_enabled = false; //marker is disabled
 volatile bool window_enabled = false;
 
 // Computer vision thread
@@ -63,15 +63,16 @@ struct image_t *cv_marker_func(struct image_t *img);
 struct image_t *cv_marker_func(struct image_t *img)
 {
 
-  if (!marker_enabled) {
+  if (!marker_enabled) { //checks if the marker is disabled
     return NULL;
   }
 
-  struct marker_deviation_t m = marker(img, marker_size);
+// sends the image and marker size and gets the deviation of the marker location with respect to the center 
+  struct marker_deviation_t m = marker(img, marker_size); 
 
-  uint32_t temp = m.x;
+  uint32_t temp = m.x; //Assigns marker deviation of x axis
   temp = temp << 16;
-  temp += m.y;
+  temp += m.y; //Assigns marker deviation of y axis
   blob_locator = temp;
 
   return NULL;
@@ -90,22 +91,29 @@ struct image_t *cv_window_func(struct image_t *img)
   }
 
 
-  uint16_t coordinate[2] = {0, 0};
-  uint16_t response = 0;
+  uint16_t coordinate[2] = {0, 0}; //initializes the image coordinates to zero
+  uint16_t response = 0; //initializes the response obtained to zero
   uint32_t integral_image[img->w * img->h];
 
   struct image_t gray;
+
+  //calls the function sending width, height and type of the image and initializes the image structure gray
   image_create(&gray, img->w, img->h, IMAGE_GRAYSCALE);
+
+  //converts the image to grayscale mode 
   image_to_grayscale(img, &gray);
 
+  //detects the window size when image buffer, width, height, coordinates of the image and mode are passed
   response = detect_window_sizes((uint8_t *)gray.buf, (uint32_t)img->w, (uint32_t)img->h, coordinate, integral_image, MODE_BRIGHT);
 
+  //the image is freed
   image_free(&gray);
 
   // Display the marker location and center-lines.
   int px = coordinate[0] & 0xFFFe;
   int py = coordinate[1] & 0xFFFe;
 
+ //checks if the response code is less than 92.
   if (response < 92) {
 
     for (int y = 0; y < img->h - 1; y++) {
@@ -132,12 +140,12 @@ struct image_t *cv_blob_locator_func(struct image_t *img);
 struct image_t *cv_blob_locator_func(struct image_t *img)
 {
 
-  if (!blob_enabled) {
+  if (!blob_enabled) { //checks if the blob is enabled
     return NULL;
   }
 
 
-  // Color Filter
+  // sets the parameters of color filter with lum,blue chromiance,red chromiance range values
   struct image_filter_t filter[2];
   filter[0].y_min = color_lum_min;
   filter[0].y_max = color_lum_max;
@@ -148,16 +156,19 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
 
   // Output image
   struct image_t dst;
+
+  //image is created by using the width,height and type and is stored in dst
   image_create(&dst,
                img->w,
                img->h,
                IMAGE_GRADIENT);
 
   // Labels
-  uint16_t labels_count = 512;
+  uint16_t labels_count = 512; //indicates the total number of connected components in an image
   struct image_label_t labels[512];
 
   // Blob finder
+   //The connected components of an image are found and each one is labeled
   image_labeling(img, &dst, filter, 1, labels, &labels_count);
 
   int largest_id = -1;

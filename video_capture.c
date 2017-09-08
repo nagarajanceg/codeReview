@@ -106,7 +106,8 @@ void video_capture_save(struct image_t *img)
 
   // Simple shot counter to find first available image location
   for (/* no init */; video_capture_index < 9999; ++video_capture_index) {
-    // Generate image location
+    // Generate image location with the name and captured Index
+   // The generated image location stored in save_name
     sprintf(save_name, "%s/img_%05d.jpg", STRINGIFY(VIDEO_CAPTURE_PATH), video_capture_index);
 
     // Continue with next number if file exists already
@@ -119,12 +120,20 @@ void video_capture_save(struct image_t *img)
     // Create jpg image from raw frame
     struct image_t img_jpeg;
     /*Based on the dimension and image type (JPEG, Gradient, YUV) the size 
-    can be calculated and dynamically allocate memory */
+    can be calculated and dynamically allocate  a memory 
+      img->w -> image width
+      img->h -> image height
+    */
     image_create(&img_jpeg, img->w, img->h, IMAGE_JPEG);
-    
+    /* img -> structure for the input image 
+       img_jpeg -> structure to hold the output image 
+       In the jpeg_encode_image method Image format choosed based on image type available in input type.
+       Then quantization tables generated for image compression and encoding is performed.
+    */
     jpeg_encode_image(img, &img_jpeg, VIDEO_CAPTURE_JPEG_QUALITY, true);
-
+// check for Exchangeable image file format header 
 #if JPEG_WITH_EXIF_HEADER
+    //EXIF adds the image information data and thumbnail image to JPEG
     write_exif_jpeg(save_name, img_jpeg.buf, img_jpeg.buf_size, img_jpeg.w, img_jpeg.h);
 #else
     // Open file
