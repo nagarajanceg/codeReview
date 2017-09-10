@@ -127,7 +127,7 @@ struct image_t *cv_window_func(struct image_t *img)
     }
 
     uint32_t temp = coordinate[0];
-    temp = temp << 16;
+    temp = temp << 16; // temp is multiplied by 16 using left bitwise shift 
     temp += coordinate[1];
     blob_locator = temp;
   }
@@ -168,10 +168,11 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
   uint16_t labels_count = 512; //indicates the total number of connected components in an image
   struct image_label_t labels[512];
 
-  // Blob finder
-   //The connected components of an image are found and each one is labeled
+  // Blob finder label the image with the provided input and output structure
+  //The connected components of an image are found and each one is labeled
   image_labeling(img, &dst, filter, 1, labels, &labels_count);
 
+  /*largest object and size is set to  initial values*/
   int largest_id = -1;
   int largest_size = 0;
 
@@ -197,7 +198,7 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
         /* Check for all the bits in the destination buffer are set to 1. 0xffff is a Hexadecimal value of 65535 */
         if (l[y * dst.w + x] != 0xffff) {
           uint8_t c = 0xff; /*assign a value of 255 to get least significant byte*/
-          /*Match dst buf iabel to the largest object label*/
+          /*Match dst buf label to the largest object label*/
           if (l[y * dst.w + x] == largest_id) {
             c = 0; // set c value as 0 
           }
@@ -211,10 +212,11 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
       }
     }
 
-
+    /*largest object label's x-coordinate divides over it's twice the number of pixels in the blob */
     uint16_t cgx = labels[largest_id].x_sum / labels[largest_id].pixel_cnt * 2;
+    /*largest object label's y-coordinate divides over it's number of pixels in the blob */
     uint16_t cgy = labels[largest_id].y_sum / labels[largest_id].pixel_cnt;
-
+    /*largest x and y coordinate compare with destination buffer width and height*/
     if ((cgx > 1) && (cgx < (dst.w - 2)) &&
         (cgy > 1) && (cgy < (dst.h - 2))
        ) {
@@ -231,13 +233,13 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
     }
 
 
-    uint32_t temp = cgx;
+    uint32_t temp = cgx; /*assigned computed largest label object x-value*/
     temp = temp << 16; // temp is multiplied by 16 using left bitwise shift 
-    temp += cgy;
-    blob_locator = temp;
+    temp += cgy; // shited largest object x-value adds with y-value
+    blob_locator = temp; // blob locator set the value of temp which is identified in the blob_locator_event
   }
 
-  image_free(&dst);
+  image_free(&dst); //memory of dst structure is freed.
 
   return NULL; // No new image is available for follow up modules
 }
@@ -284,6 +286,7 @@ void cv_blob_locator_periodic(void)
 
 void cv_blob_locator_event(void)
 {
+  /*various state maintained based on blob_locator_type*/
   switch (cv_blob_locator_type) { 
     case 1:
       blob_enabled = true;
@@ -306,6 +309,7 @@ void cv_blob_locator_event(void)
       window_enabled = false;
       break;
   }
+  /*Suppose if blob locator is not set in previous steps*/
   if (blob_locator != 0) {
     // CV thread has results: import
     uint32_t temp = blob_locator;
@@ -313,16 +317,16 @@ void cv_blob_locator_event(void)
 
     // Process
     uint16_t y = temp & 0x0000ffff;
-    temp = temp >> 16;
+    temp = temp >> 16;// temp is dividef by 16 using right bitwise shift 
     uint16_t x = temp & 0x0000ffff;
     printf("Found %d %d \n", x, y);
 
     struct camera_frame_t cam;
-    cam.px = x / 2;
-    cam.py = y / 2;
-    cam.f = 400;
-    cam.h = 240;
-    cam.w = 320;
+    cam.px = x / 2; /*left target pixel coordinate*/
+    cam.py = y / 2; /*right target pixel coordinate*/
+    cam.f = 400; /*camera focal length set to 400px*/
+    cam.h = 240; /*frame height*/
+    cam.w = 320; /*frame width*/ 
 
 #ifdef WP_p1
     georeference_project(&cam, WP_p1);
@@ -344,22 +348,24 @@ extern void cv_blob_locator_stop(void)
 {
 
 }
-
+/*Start the recording the video via camera */
 void start_vision(void)
 {
-  georeference_init();
+  georeference_init(); /*intialize the geo locations values with deafult values and focul length as 400*/
   record_video = 1;
-  cv_blob_locator_type = 3;
+  cv_blob_locator_type = 3; /*window enabled by this type 3*/
 }
+/*Continue the video recording and mark the regions occupied by any objects*/
 void start_vision_land(void)
 {
-  georeference_init();
+  georeference_init();/*intialize the geo locations values with deafult values and focul length as 400*/
   record_video = 1;
-  cv_blob_locator_type = 2;
+  cv_blob_locator_type = 2; /*marker enabled and disabled window and blob  */
 }
+/*stop the video once the blob regions identified*/
 void stop_vision(void)
 {
-  georeference_init();
+  georeference_init();/*intialize the geo locations values with deafult values and focul length as 400*/
   record_video = 0;
-  cv_blob_locator_type = 0;
+  cv_blob_locator_type = 0;/*blob enabled*/
 }

@@ -43,13 +43,20 @@ extern uint8_t cv_blob_locator_type;
 extern int marker_size;
 extern int geofilter_length;
 extern int record_video;
-
+/*intialize the filter colors, blob_locator_reset, geolocation with deafult values and add listeners to blob events */
 extern void cv_blob_locator_init(void);
+/*Empty methods*/
 extern void cv_blob_locator_periodic(void);
+/*Based on the locator_types the attributes needed for blob locator changed and test blob_locator
+	set condition. if it is set attributes of the camera frame is changed.
+ */
 extern void cv_blob_locator_event(void);
+/*geolocation intialize with default values*/
 extern void cv_blob_locator_start(void);
+/*Empty methods*/
 extern void cv_blob_locator_stop(void);
 
+// This is reset the location by start capturing present location using cs_blob_locator_start
 #define cv_blob_locator_GeoReset(_v) {       \
     cv_blob_locator_start();                 \
   }

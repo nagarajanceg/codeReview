@@ -23,7 +23,7 @@ struct image_t {
   void *buf;              ///< Image buffer (depending on the image_type)
 };
 
-
+used in blol_locator.c cv_blob_locator_event
 struct camera_frame_t {
   int32_t w;     ///< Frame width [px]
   int32_t h;     ///< Frame height [px]
