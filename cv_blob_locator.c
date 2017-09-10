@@ -45,19 +45,19 @@ uint8_t color_cb_max; //declaration of maximum range value blue chromiance
 uint8_t color_cr_min; //declaration of minimum range value red chromiance
 uint8_t color_cr_max; //declaration of maximum range value red chromiance
 
-uint8_t cv_blob_locator_reset;
-uint8_t cv_blob_locator_type;
+uint8_t cv_blob_locator_reset; //declaration of reset option for blob locator 
+uint8_t cv_blob_locator_type; //declaration of blob locator type to be identified in image
 
 int geofilter_length = 5; //initializes the length of time the geofilter will be active
 int marker_size = 18; //sets the size of the marker
-int record_video = 0;
+int record_video = 0; //initializes the size of video to zero
 
 /*volatile - the value of the variable can change at any time*/
 volatile uint32_t blob_locator = 0; 
 
 volatile bool blob_enabled = false; //blob locator is disabled
 volatile bool marker_enabled = false; //marker is disabled
-volatile bool window_enabled = false;
+volatile bool window_enabled = false; //window disabled
 
 // Computer vision threads
 struct image_t *cv_marker_func(struct image_t *img);
@@ -74,7 +74,7 @@ struct image_t *cv_marker_func(struct image_t *img)
   uint32_t temp = m.x; //Assigns marker deviation of x axis
   temp = temp << 16;
   temp += m.y; //Assigns marker deviation of y axis
-  blob_locator = temp;
+  blob_locator = temp; 
 
   return NULL;
 }
@@ -84,7 +84,7 @@ struct image_t *cv_marker_func(struct image_t *img)
 
 // Computer vision thread
 struct image_t *cv_window_func(struct image_t *img);
-struct image_t *cv_window_func(struct image_t *img)
+struct image_t *cv_window_func(struct image_t *img) 
 {
 
   if (!window_enabled) {
@@ -92,9 +92,9 @@ struct image_t *cv_window_func(struct image_t *img)
   }
 
 
-  uint16_t coordinate[2] = {0, 0}; //initializes the image coordinates to zero
-  uint16_t response = 0; //initializes the response obtained to zero
-  uint32_t integral_image[img->w * img->h];
+  uint16_t coordinate[2] = {0, 0}; //initializes the image pixel coordinates to zero
+  uint16_t response = 0; //initializes the response i.e finding the pixel to zero
+  uint32_t integral_image[img->w * img->h]; // the height and width of the bolb 
 
   struct image_t gray;
 
@@ -104,15 +104,15 @@ struct image_t *cv_window_func(struct image_t *img)
   //converts the image to grayscale mode 
   image_to_grayscale(img, &gray);
 
-  //detects the window size when image buffer, width, height, coordinates of the image and mode are passed
+  //detects the window size and sends the response if any pixel is found when image buffer, width, height, coordinates of the image and mode are passed
   response = detect_window_sizes((uint8_t *)gray.buf, (uint32_t)img->w, (uint32_t)img->h, coordinate, integral_image, MODE_BRIGHT);
 
   //the image is freed
   image_free(&gray);
 
   // Display the marker location and center-lines.
-  int px = coordinate[0] & 0xFFFe;
-  int py = coordinate[1] & 0xFFFe;
+  int px = coordinate[0] & 0xFFFe;  // the x-coordinate of the new pixel
+  int py = coordinate[1] & 0xFFFe;  // the y-coordinate of the new pixel
 
  //checks if the response code is less than 92.
   if (response < 92) {
@@ -277,7 +277,7 @@ void cv_blob_locator_periodic(void)
 
 void cv_blob_locator_event(void)
 {
-  switch (cv_blob_locator_type) {
+  switch (cv_blob_locator_type) { 
     case 1:
       blob_enabled = true;
       marker_enabled = false;
