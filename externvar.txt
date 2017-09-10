@@ -9,6 +9,7 @@ typedef   signed long       int32_t;/*32 bit signed long */
 typedef unsigned long long uint64_t; /*64 bit unsigned long */
 typedef   signed long long  int64_t; /*64 bit signed long */
 
+/*Used in cv.h*/
 /* Main image structure */
 struct image_t {
   enum image_type type;   ///< The image type
