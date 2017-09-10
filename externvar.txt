@@ -42,3 +42,22 @@ struct georeference_t {
 
   struct georeference_filter_t filter;  ///< Filter waypoint location
 };
+
+
+/*available in blob_finder.h and used in blob_locator.c in image_labelling*/
+/* Blob object: connected pixels */
+struct image_label_t {
+  uint16_t id;              ///< Blob number
+  uint8_t filter;           ///< Which filter triggered this blob
+
+  uint32_t pixel_cnt;       ///< Number of pixels in the blob
+  uint16_t x_min;           ///< Top left corner
+  uint16_t y_min;
+  uint32_t x_sum;           ///< Sum of all x coordinates (used to find center of gravity)
+  uint32_t y_sum;
+
+  struct point_t contour[512];
+  uint16_t contour_cnt;
+
+  uint16_t corners[4];
+};

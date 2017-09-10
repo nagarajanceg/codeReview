@@ -72,7 +72,7 @@ struct image_t *cv_marker_func(struct image_t *img)
   struct marker_deviation_t m = marker(img, marker_size); 
 
   uint32_t temp = m.x; //Assigns marker deviation of x axis
-  temp = temp << 16;
+  temp = temp << 16; // temp is multiplied by 16 using left bitwise shift 
   temp += m.y; //Assigns marker deviation of y axis
   blob_locator = temp; 
 
@@ -107,7 +107,7 @@ struct image_t *cv_window_func(struct image_t *img)
   //detects the window size and sends the response if any pixel is found when image buffer, width, height, coordinates of the image and mode are passed
   response = detect_window_sizes((uint8_t *)gray.buf, (uint32_t)img->w, (uint32_t)img->h, coordinate, integral_image, MODE_BRIGHT);
 
-  //the image is freed
+  //the image is freed from memory
   image_free(&gray);
 
   // Display the marker location and center-lines.
@@ -158,7 +158,7 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
   struct image_t dst;
 
   //image is created by using the width,height and type and is stored in dst of structure image_t
-  // Based on the type of image(YUV422, JPEG, IMAGE_GRADIENT) , size is allocated dynamically 
+  // Based on the type of image(YUV422, JPEG, IMAGE_GRADIENT), size is allocated dynamically 
   image_create(&dst,
                img->w,
                img->h,
@@ -179,27 +179,34 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
   for (int i = 0; i < labels_count; i++) {
     // Only consider large blobs
     if (labels[i].pixel_cnt > 50) {
+      /*check for the image label pixel cnt is greater than computed largest_size so far*/
       if (labels[i].pixel_cnt > largest_size) {
-        largest_size = labels[i].pixel_cnt;
-        largest_id = i;
+        largest_size = labels[i].pixel_cnt; /*change the largest size */
+        largest_id = i; /*record the largest object label*/
       }
     }
   }
-
+  /*check for any largest objects available*/
   if (largest_id >= 0) {
-    uint8_t *p = (uint8_t *) img->buf;
-    uint16_t *l = (uint16_t *) dst.buf;
+    uint8_t *p = (uint8_t *) img->buf; /*8 bit unsigned pointer address points to the image buffer*/
+    uint16_t *l = (uint16_t *) dst.buf;/*16 bit unsigned pointer address points to the destination buffer*/
+    /*loop variable y iterates the image height*/
     for (int y = 0; y < dst.h; y++) {
+      /*loop variable x iterates the image width up to middle */
       for (int x = 0; x < dst.w / 2; x++) {
+        /* Check for all the bits in the destination buffer are set to 1. 0xffff is a Hexadecimal value of 65535 */
         if (l[y * dst.w + x] != 0xffff) {
-          uint8_t c = 0xff;
+          uint8_t c = 0xff; /*assign a value of 255 to get least significant byte*/
+          /*Match dst buf iabel to the largest object label*/
           if (l[y * dst.w + x] == largest_id) {
-            c = 0;
+            c = 0; // set c value as 0 
           }
-          p[y * dst.w * 2 + x * 4] = c;
-          p[y * dst.w * 2 + x * 4 + 1] = 0x80;
-          p[y * dst.w * 2 + x * 4 + 2] = c;
-          p[y * dst.w * 2 + x * 4 + 3] = 0x80;
+          /*locate image buffer pointer p index based on the values of height and width of dst buffer and assign values*/
+          /*Hexadecimal values assigned in 4 bits in the next 4 steps*/
+          p[y * dst.w * 2 + x * 4] = c; /*first 4bits set either 0 or 255(0xff)*/
+          p[y * dst.w * 2 + x * 4 + 1] = 0x80;/*second 4 bits set value 128*/
+          p[y * dst.w * 2 + x * 4 + 2] = c;/* third 4bits set either 0 or 255(0xff)*/
+          p[y * dst.w * 2 + x * 4 + 3] = 0x80;/*fourth 4bits set value 128*/
         }
       }
     }
