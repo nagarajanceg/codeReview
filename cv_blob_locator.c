@@ -61,6 +61,7 @@ volatile bool window_enabled = false; //window disabled
 
 // Computer vision threads
 struct image_t *cv_marker_func(struct image_t *img);
+/*marker function  event listener binds to the device*/
 struct image_t *cv_marker_func(struct image_t *img)
 {
 
@@ -72,7 +73,7 @@ struct image_t *cv_marker_func(struct image_t *img)
   struct marker_deviation_t m = marker(img, marker_size); 
 
   uint32_t temp = m.x; //Assigns marker deviation of x axis
-  temp = temp << 16; // temp is multiplied by 16 using left bitwise shift 
+  temp = temp << 16; //  temp is multiplied by 2 power of 16 using left bitwise shift 
   temp += m.y; //Assigns marker deviation of y axis
   blob_locator = temp; 
 
@@ -84,6 +85,7 @@ struct image_t *cv_marker_func(struct image_t *img)
 
 // Computer vision thread
 struct image_t *cv_window_func(struct image_t *img);
+/*window function event listener binds to the device*/
 struct image_t *cv_window_func(struct image_t *img) 
 {
 
@@ -127,7 +129,7 @@ struct image_t *cv_window_func(struct image_t *img)
     }
 
     uint32_t temp = coordinate[0];
-    temp = temp << 16; // temp is multiplied by 16 using left bitwise shift 
+    temp = temp << 16; // temp is multiplied by 2 power of 16 using left bitwise shift 
     temp += coordinate[1];
     blob_locator = temp;
   }
@@ -137,6 +139,7 @@ struct image_t *cv_window_func(struct image_t *img)
 
 
 struct image_t *cv_blob_locator_func(struct image_t *img);
+/*blob locator function event listener binds to the device*/
 struct image_t *cv_blob_locator_func(struct image_t *img)
 {
 
@@ -234,7 +237,7 @@ struct image_t *cv_blob_locator_func(struct image_t *img)
 
 
     uint32_t temp = cgx; /*assigned computed largest label object x-value*/
-    temp = temp << 16; // temp is multiplied by 16 using left bitwise shift 
+    temp = temp << 16; //  temp is multiplied by 2 power of 16 using left bitwise shift 
     temp += cgy; // shited largest object x-value adds with y-value
     blob_locator = temp; // blob locator set the value of temp which is identified in the blob_locator_event
   }
@@ -272,6 +275,7 @@ void cv_blob_locator_init(void) //initializing the global variables
   georeference_init(); //the dimensions of the vectors are initialized
 
   //Adds a video listener
+
   cv_add_to_device(&BLOB_LOCATOR_CAMERA, cv_blob_locator_func, BLOB_LOCATOR_FPS);
   cv_add_to_device(&BLOB_LOCATOR_CAMERA, cv_marker_func, BLOB_LOCATOR_FPS);
   cv_add_to_device(&BLOB_LOCATOR_CAMERA, cv_window_func, BLOB_LOCATOR_FPS);
@@ -293,7 +297,7 @@ void cv_blob_locator_event(void)
       marker_enabled = false;
       window_enabled = false;
       break;
-    case 2:
+    case 2:/*looking for regions to be marker*/
       blob_enabled = false;
       marker_enabled = true;
       window_enabled = false;
@@ -317,7 +321,7 @@ void cv_blob_locator_event(void)
 
     // Process
     uint16_t y = temp & 0x0000ffff;
-    temp = temp >> 16;// temp is dividef by 16 using right bitwise shift 
+    temp = temp >> 16;// temp is divided by 2 power of 16 using right bitwise shift 
     uint16_t x = temp & 0x0000ffff;
     printf("Found %d %d \n", x, y);
 
