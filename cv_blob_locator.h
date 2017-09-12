@@ -27,22 +27,22 @@
 #define CV_BLOB_LOCATOR_H
 
 #include <stdint.h>
-/* extern - already defined in someother fille */
-extern uint8_t color_lum_min;
-extern uint8_t color_lum_max;
+extern uint8_t color_lum_min; //declaration of lower upper middle filter minimum range value
+extern uint8_t color_lum_max; //declaration of lower upper middle filter maximum range value
 
-extern uint8_t color_cb_min;
-extern uint8_t color_cb_max;
+extern uint8_t color_cb_min; //declaration of minimum range value blue chromiance
+extern uint8_t color_cb_max; //declaration of maximum range value blue chromiance
 
-extern uint8_t color_cr_min;
-extern uint8_t color_cr_max;
+extern uint8_t color_cr_min; //declaration of minimum range value red chromiance
+extern uint8_t color_cr_max; //declaration of maximum range value red chromiance
 
-extern uint8_t cv_blob_locator_reset;
-extern uint8_t cv_blob_locator_type;
+extern uint8_t cv_blob_locator_reset; //declaration of reset option for blob locator
+extern uint8_t cv_blob_locator_type; //declaration of blob locator type to be identified in image
 
-extern int marker_size;
-extern int geofilter_length;
-extern int record_video;
+extern int marker_size; //declaration of the size of the marker
+extern int geofilter_length; //declaration of the length of time the geofilter will be active
+extern int record_video; //declaration of the size of video 
+
 /*intialize the filter colors, blob_locator_reset, geolocation with deafult values and add listeners to blob events */
 extern void cv_blob_locator_init(void);
 /*Empty methods*/
@@ -66,9 +66,9 @@ extern void cv_blob_locator_stop(void);
 #define StopVision(X) { stop_vision(); false; }
 
 
-extern void start_vision(void);
-extern void start_vision_land(void);
-extern void stop_vision(void);
+extern void start_vision(void); /*function declaration to record the video via camera */
+extern void start_vision_land(void); /*function declaration to continue the video recording and mark the regions occupied by any objects*/
+extern void stop_vision(void); /*function declaration to stop the video once the blob regions identified*/
 
 
 #endif
